@@ -11,7 +11,7 @@ public class ImageEditController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> EditImage([FromBody] ImageEditRequest request)
     {
-        Console.WriteLine($"Received a write {request.Texts.Count} text on the image at {request.ImageUrl}");
+        Console.WriteLine($"Received a request to write {request.Texts.Count} texts on the image at {request.ImageUrl}");
 
         // Download the image from the URL provided in the request
         byte[] imageBytes;
