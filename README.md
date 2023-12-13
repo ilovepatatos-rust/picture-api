@@ -1,2 +1,25 @@
-# picture-api
-Exposes a public api to draw text above images.
+# Picture Framework
+Picture framework exposes an api to draw text above images. It can be hosted via C# or within a Docker.
+
+## How to use
+1. Fonts must be within the `fonts` folder.
+2. Api is hosted on the port 5000 by default.
+3. The api accepts a POST request with a JSON body.
+
+### JSON Format
+```json
+{
+  "ImageUrl": "your-image-url",
+  "Texts": [
+    {
+      "Value": "Text #1",
+      "Offset": {
+        "X": 50,
+        "Y": 200
+      },
+      "Size": 24,
+      "Font": "MisterBrush.ttf"
+    }
+  ]
+}
+```
