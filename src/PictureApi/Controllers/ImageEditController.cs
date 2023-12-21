@@ -11,7 +11,7 @@ public class ImageEditController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> EditImage([FromBody] ImageEditRequest request)
     {
-        Console.WriteLine($"Received a request to write {request.Texts.Count} texts on the image at {request.ImageUrl}");
+        Console.WriteLine($"Received a request to write {request.Texts.Count} texts and {request.Images.Count} overlays on the image at {request.ImageUrl}");
 
         // Download the image from the URL provided in the request
         byte[] imageBytes;
@@ -34,23 +34,15 @@ public class ImageEditController : ControllerBase
             var canvas = surface.Canvas;
             canvas.DrawBitmap(bitmap, 0, 0);
 
-            // Apply each text instruction
-            foreach (var instruction in request.Texts)
-            {
-                using var paint = new SKPaint();
+            if (request.Images != null)
+                ApplyImages(canvas, request.Images);
 
-                // Load the font from the file
-                var typeface = SKTypeface.FromFile($"./fonts/{instruction.Font}");
-                paint.Typeface = typeface;
-                paint.TextSize = instruction.Size;
-                paint.Color = SKColors.White;
-
-                // Draw the text onto the canvas
-                canvas.DrawText(instruction.Value, instruction.Offset.X, instruction.Offset.Y, paint);
-            }
+            if (request.Texts != null)
+                ApplyTexts(canvas, request.Texts);
 
             // Convert the surface to an image, then to a byte array
             using (var image = surface.Snapshot())
+            {
                 using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
                 {
                     var imageArray = data.ToArray();
@@ -58,6 +50,58 @@ public class ImageEditController : ControllerBase
                     // Return the byte array
                     return File(imageArray, "image/png");
                 }
+            }
+        }
+    }
+
+    private static async void ApplyImages(SKCanvas canvas, List<ImageOverlay> images)
+    {
+        foreach (var overlay in images)
+        {
+            byte[] overlayImageBytes;
+            using (var httpClient = new HttpClient())
+            {
+                overlayImageBytes = await httpClient.GetByteArrayAsync(overlay.Url);
+            }
+
+            SKBitmap overlayBitmap;
+            using (var stream = new MemoryStream(overlayImageBytes))
+            {
+                overlayBitmap = SKBitmap.Decode(stream);
+            }
+
+            // Resize if necessary
+            SKBitmap resizedOverlayBitmap = overlayBitmap;
+            if (overlay.Size.Width > 0 && overlay.Size.Height > 0)
+            {
+                resizedOverlayBitmap = new SKBitmap((int)overlay.Size.Width, (int)overlay.Size.Height);
+
+                using var resizeCanvas = new SKCanvas(resizedOverlayBitmap);
+                //resizeCanvas.DrawBitmap(overlayBitmap, new SKRect(0, 0, overlay.Size.Width, overlay.Size.Height));
+                resizeCanvas.DrawBitmap(overlayBitmap,
+                    new SKRect(0, 0, overlayBitmap.Width, overlayBitmap.Height),
+                    new SKRect(0, 0, overlay.Size.Width, overlay.Size.Height));
+            }
+
+            // Draw the overlay image
+            canvas.DrawBitmap(resizedOverlayBitmap, overlay.Offset.X, overlay.Offset.Y);
+        }
+    }
+
+    private static void ApplyTexts(SKCanvas canvas, List<Text> texts)
+    {
+        foreach (var instruction in texts)
+        {
+            using var paint = new SKPaint();
+
+            // Load the font from the file
+            var typeface = SKTypeface.FromFile($"./fonts/{instruction.Font}");
+            paint.Typeface = typeface;
+            paint.TextSize = instruction.Size;
+            paint.Color = SKColors.White;
+
+            // Draw the text onto the canvas
+            canvas.DrawText(instruction.Value, instruction.Offset.X, instruction.Offset.Y, paint);
         }
     }
 }
