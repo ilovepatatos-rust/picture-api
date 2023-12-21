@@ -35,7 +35,7 @@ public class ImageEditController : ControllerBase
             canvas.DrawBitmap(bitmap, 0, 0);
 
             if (request.Images != null)
-                ApplyImages(canvas, request.Images);
+                await ApplyImages(canvas, request.Images);
 
             if (request.Texts != null)
                 ApplyTexts(canvas, request.Texts);
@@ -54,7 +54,7 @@ public class ImageEditController : ControllerBase
         }
     }
 
-    private static async void ApplyImages(SKCanvas canvas, List<ImageOverlay> images)
+    private static async Task ApplyImages(SKCanvas canvas, List<ImageOverlay> images)
     {
         foreach (var overlay in images)
         {
