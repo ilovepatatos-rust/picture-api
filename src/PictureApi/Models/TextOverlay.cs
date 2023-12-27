@@ -3,7 +3,7 @@
 namespace PictureApi.Models;
 
 [Serializable]
-public class Text
+public class TextOverlay
 {
     public string Value { get; set; }
     public PointF Offset { get; set; }

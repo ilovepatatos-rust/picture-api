@@ -88,7 +88,7 @@ public class ImageEditController : ControllerBase
         }
     }
 
-    private static void ApplyTexts(SKCanvas canvas, List<Text> texts)
+    private static void ApplyTexts(SKCanvas canvas, List<TextOverlay> texts)
     {
         foreach (var instruction in texts)
         {
