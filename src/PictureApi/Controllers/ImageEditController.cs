@@ -60,6 +60,9 @@ public class ImageEditController : ControllerBase
     {
         foreach (var overlay in images)
         {
+            if(string.IsNullOrEmpty(overlay.Url))
+                continue;
+
             byte[] overlayImageBytes;
             using (var httpClient = new HttpClient())
             {
@@ -92,16 +95,19 @@ public class ImageEditController : ControllerBase
 
     private static void ApplyTexts(SKCanvas canvas, List<TextOverlay> texts)
     {
-        foreach (var instruction in texts)
+        foreach (var overlay in texts)
         {
+            if (string.IsNullOrEmpty(overlay.Text) || overlay.Size <= 0)
+                continue;
+
             using var paint = new SKPaint();
 
-            paint.Color = ColorUtility.ToColor(instruction.HexString);
-            paint.TextSize = instruction.Size;
-            paint.Typeface = FontUtility.ToFont(instruction.Font);
+            paint.Color = ColorUtility.ToColor(overlay.HexString);
+            paint.TextSize = overlay.Size;
+            paint.Typeface = FontUtility.ToFont(overlay.Font);
 
-            PointF offset = AlignmentUtility.AlignText(paint, instruction);
-            canvas.DrawText(instruction.Text, offset.X, offset.Y, paint);
+            PointF offset = AlignmentUtility.AlignText(paint, overlay);
+            canvas.DrawText(overlay.Text, offset.X, offset.Y, paint);
         }
     }
 }

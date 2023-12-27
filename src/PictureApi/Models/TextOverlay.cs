@@ -11,7 +11,7 @@ public class TextOverlay
     public string Text { get; set; } = "";
 
     [JsonProperty("Size")]
-    public float Size { get; set; } = 12;
+    public ushort Size { get; set; } = 12;
 
     [JsonProperty("Font")]
     public string Font { get; set; } = "MisterBrush.ttf";

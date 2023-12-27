@@ -6,15 +6,15 @@ namespace PictureApi;
 
 public static class AlignmentUtility
 {
-    public static PointF AlignText(SKPaint paint, TextOverlay instruction)
+    public static PointF AlignText(SKPaint paint, TextOverlay overlay)
     {
         SKRect bounds = new();
-        paint.MeasureText(instruction.Text, ref bounds);
+        paint.MeasureText(overlay.Text, ref bounds);
 
-        float x = instruction.Offset.X;
-        float y = instruction.Offset.Y;
+        float x = overlay.Offset.X;
+        float y = overlay.Offset.Y;
 
-        switch (instruction.HorizontalAlignment)
+        switch (overlay.HorizontalAlignment)
         {
             case HorizontalAlignment.CENTERED:
                 x -= bounds.MidX;
@@ -24,7 +24,7 @@ public static class AlignmentUtility
                 break;
         }
 
-        switch (instruction.VerticalAlignment)
+        switch (overlay.VerticalAlignment)
         {
             case VerticalAlignment.CENTERED:
                 y -= bounds.MidY;
