@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using Microsoft.AspNetCore.Mvc;
+using PictureApi.Binders;
 using PictureApi.Models;
 using SkiaSharp;
 
@@ -10,10 +11,13 @@ namespace PictureApi.Controllers;
 public class ImageEditController : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> AddOverlays([FromBody] ImageEditRequest request)
+    public async Task<IActionResult> AddOverlays([ModelBinder(typeof(JsonModelBinder))] ImageEditRequest request)
     {
         Console.WriteLine(
             $"Received a request to write {request.Texts.Count} texts and {request.Images.Count} image overlays on the image at {request.ImageUrl}");
+
+        if (string.IsNullOrEmpty(request.ImageUrl))
+            return BadRequest("No background image URL provided");
 
         // Download the image from the URL provided in the request
         byte[] imageBytes;
@@ -60,7 +64,7 @@ public class ImageEditController : ControllerBase
     {
         foreach (var overlay in images)
         {
-            if(string.IsNullOrEmpty(overlay.Url))
+            if (string.IsNullOrEmpty(overlay.Url))
                 continue;
 
             byte[] overlayImageBytes;
@@ -82,13 +86,11 @@ public class ImageEditController : ControllerBase
                 resizedOverlayBitmap = new SKBitmap((int)overlay.Size.Width, (int)overlay.Size.Height);
 
                 using var resizeCanvas = new SKCanvas(resizedOverlayBitmap);
-                //resizeCanvas.DrawBitmap(overlayBitmap, new SKRect(0, 0, overlay.Size.Width, overlay.Size.Height));
                 resizeCanvas.DrawBitmap(overlayBitmap,
                     new SKRect(0, 0, overlayBitmap.Width, overlayBitmap.Height),
                     new SKRect(0, 0, overlay.Size.Width, overlay.Size.Height));
             }
 
-            // Draw the overlay image
             canvas.DrawBitmap(resizedOverlayBitmap, overlay.Offset.X, overlay.Offset.Y);
         }
     }
