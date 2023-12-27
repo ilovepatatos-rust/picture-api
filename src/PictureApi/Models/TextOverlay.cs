@@ -8,13 +8,13 @@ namespace PictureApi.Models;
 public class TextOverlay
 {
     [JsonProperty("Text")]
-    public string Text { get; set; }
+    public string Text { get; set; } = "";
 
     [JsonProperty("Size")]
-    public float Size { get; set; }
+    public float Size { get; set; } = 12;
 
     [JsonProperty("Font")]
-    public string Font { get; set; }
+    public string Font { get; set; } = "MisterBrush.ttf";
 
     [JsonProperty("Hex")]
     public string HexString { get; set; } = "#FFFFFF";
