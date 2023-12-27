@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Drawing;
+using Microsoft.AspNetCore.Mvc;
 using PictureApi.Models;
 using SkiaSharp;
 
@@ -9,9 +10,10 @@ namespace PictureApi.Controllers;
 public class ImageEditController : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> EditImage([FromBody] ImageEditRequest request)
+    public async Task<IActionResult> AddOverlays([FromBody] ImageEditRequest request)
     {
-        Console.WriteLine($"Received a request to write {request.Texts.Count} texts and {request.Images.Count} overlays on the image at {request.ImageUrl}");
+        Console.WriteLine(
+            $"Received a request to write {request.Texts.Count} texts and {request.Images.Count} image overlays on the image at {request.ImageUrl}");
 
         // Download the image from the URL provided in the request
         byte[] imageBytes;
@@ -94,14 +96,12 @@ public class ImageEditController : ControllerBase
         {
             using var paint = new SKPaint();
 
-            // Load the font from the file
-            var typeface = SKTypeface.FromFile($"./fonts/{instruction.Font}");
-            paint.Typeface = typeface;
+            paint.Color = ColorUtility.ToColor(instruction.HexString);
             paint.TextSize = instruction.Size;
-            paint.Color = SKColors.White;
+            paint.Typeface = FontUtility.ToFont(instruction.Font);
 
-            // Draw the text onto the canvas
-            canvas.DrawText(instruction.Value, instruction.Offset.X, instruction.Offset.Y, paint);
+            PointF offset = AlignmentUtility.AlignText(paint, instruction);
+            canvas.DrawText(instruction.Text, offset.X, offset.Y, paint);
         }
     }
 }
