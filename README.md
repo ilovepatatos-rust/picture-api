@@ -9,16 +9,29 @@ Picture framework exposes an api to draw text above images. It can be hosted via
 ### JSON Format
 ```json
 {
-  "ImageUrl": "your-image-url",
-  "Texts": [
+  "Background image url": "",
+  "Text overlays": [
     {
-      "Value": "Text #1",
-      "Offset": {
-        "X": 50,
-        "Y": 200
-      },
+      "Text": "",
       "Size": 24,
-      "Font": "MisterBrush.ttf"
+      "Font": "Arial.ttf",
+      "Hex": "#FFFFFF",
+      "Horizontal alignment [ LEFT | CENTER | RIGHT ]": "LEFT",
+      "Vertical alignment [ TOP | CENTER | BOTTOM ]": "CENTERED",
+      "Offset": {
+        "X": 0.0,
+        "Y": 0.0
+      }
+    }
+  ],
+  "Image overlays": [
+    {
+      "Image url": "",
+      "Offset": {
+        "X": 0.0,
+        "Y": 0.0
+      },
+      "Size": "100, 100"
     }
   ]
 }
